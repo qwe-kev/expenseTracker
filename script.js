@@ -4,6 +4,7 @@ const expDesc = document.querySelector("#expDescription");
 const expCat = document.querySelector("#expCategory");
 const message = document.querySelector(".msg");
 const expList = document.querySelector(".expList");
+const buttonSubmit = document.querySelector("#Button");
 
 
 myForm.addEventListener('submit', onSubmit);
@@ -14,7 +15,7 @@ function onSubmit(e) {
         message.classList.add("bg-danger");
         message.innerHTML = "please enter all fields";
 
-        setTimeout(() => message.remove(), 3000);
+        setTimeout(() => message.remove(), 1000);
     }
     else {
         const li = document.createElement("li");
@@ -56,8 +57,7 @@ function deleteItem(e) {
     e.preventDefault();
     if(e.target.classList && e.target.classList.contains("btn-danger")) {
         let arr = e.target.parentNode.firstChild.wholeText.split('-');
-        console.log(arr);
-        localStorage.removeItem(`item ${arr[0]} ${arr[1]}`)
+        localStorage.removeItem(`item ${arr[1]} ${arr[0]}`);
         e.target.parentNode.remove();
         window.location.reload();
     }
@@ -83,3 +83,38 @@ function displayList(e) {
     })
 
 }
+
+expList.addEventListener('click', editItem);
+
+function editItem(e) {
+    e.preventDefault();
+    if(e.target.classList.contains("btn-primary")) {
+        message.classList.add('bg-info');
+        message.innerHTML = "Edit details of the field"
+        let [valDesc, valAmt, valCat] = e.target.parentNode.firstChild.wholeText.split('-');
+        document.querySelector("#expAmount").setAttribute('value',valAmt);
+        document.querySelector("#expDescription").setAttribute('value', valDesc);
+        buttonSubmit.classList.remove("btn-primary");
+        buttonSubmit.classList.add("btn-success")
+        buttonSubmit.innerHTML = "Update";
+        buttonSubmit.addEventListener('click', e => {
+                if(buttonSubmit.innerHTML === "Update") {
+                    e.preventDefault();
+                    const newexpAmt = document.querySelector("#expAmount");
+                    const newexpDesc = document.querySelector("#expDescription");
+                    const newexpCat = document.querySelector("#expCategory");
+                   if(newexpAmt.value === valAmt & newexpDesc.value === valDesc & newexpCat.value === valCat) {
+                    message.classList.add("bg-warning");
+                    message.innerHTML = "No changes found";
+                    setTimeout(() => message.remove(), 1000);
+                   }
+                   else{
+                    localStorage.removeItem(`item ${valDesc} ${valAmt}`);
+                    e.target.parentNode.remove();
+                    onSubmit(e);
+                    window.location.reload();
+                   }
+                }
+            })
+        }
+    }
